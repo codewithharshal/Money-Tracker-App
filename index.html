@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Tracker App</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Money Tracker App</h2>
+        <form id="expenseForm">
+            <div class="form-group">
+                <label for="expenseName">Expense Name:</label>
+                <input type="text" class="form-control" id="expenseName" required>
+            </div>
+            <div class="form-group">
+                <label for="expenseAmount">Expense Amount:</label>
+                <input type="number" class="form-control" id="expenseAmount" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Expense</button>
+        </form>
+
+        <hr>
+
+        <h3>Expenses</h3>
+        <ul id="expenseList" class="list-group">
+            <!-- Expenses will be listed here -->
+        </ul>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Function to add expense
+        function addExpense(event) {
+            event.preventDefault();
+            var expenseName = document.getElementById('expenseName').value;
+            var expenseAmount = document.getElementById('expenseAmount').value;
+
+            // Create a new expense object
+            var expense = {
+                name: expenseName,
+                amount: parseFloat(expenseAmount)
+            };
+
+            // Get existing expenses from local storage or initialize an empty array
+            var expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+            // Add the new expense to the expenses array
+            expenses.push(expense);
+
+            // Save expenses to local storage
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+
+            // Clear the form fields
+            document.getElementById('expenseName').value = '';
+            document.getElementById('expenseAmount').value = '';
+
+            // Refresh the expense list
+            displayExpenses();
+        }
+
+        // Function to display expenses
+        function displayExpenses() {
+            var expenseList = document.getElementById('expenseList');
+            expenseList.innerHTML = '';
+
+            var expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+            expenses.forEach(function(expense, index) {
+                var li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = `
+                    <span>${expense.name}: $${expense.amount}</span>
+                    <button class="btn btn-sm btn-danger float-right" onclick="deleteExpense(${index})">Delete</button>
+                `;
+                expenseList.appendChild(li);
+            });
+        }
+
+        // Function to delete an expense
+        function deleteExpense(index) {
+            var expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+            expenses.splice(index, 1);
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            displayExpenses();
+        }
+
+        // Initial display of expenses when the page loads
+        displayExpenses();
+
+        // Event listener for the expense form submission
+        document.getElementById('expenseForm').addEventListener('submit', addExpense);
+    </script>
+</body>
+</html>
